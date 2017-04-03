@@ -34,6 +34,22 @@ INSTALLED_APPS = [
 
 > Note: `cra_helper` **must** be placed above `django.contrib.staticfiles` in the list!
 
+Add `cra_helper.context_processors.static` to `TEMPLATES['OPTIONS']['context_processors']`:
+
+```python
+TEMPLATES = [
+    {
+        # ...snip...
+        'OPTIONS': {
+            'context_processors': [
+                # ...snip...
+                'cra_helper.context_processors.static',
+            ],
+        },
+    },
+]
+```
+
 Additionally, the following `STATICFILES_FINDERS` list will also need to be added to `settings.py`:
 
 ```python
