@@ -76,6 +76,8 @@ CRA_PORT = 9999
 
 > Note: if you don't set a value for `CRA_PORT` then **django-cra-helper** will default to port `3000`.
 
+Finally, run CRA's `npm run build` command once to generate a `build/` directory. **django-cra-helper** requires the `build/asset-manifest.json` file contained within to help load non-JS and non-CSS assets that might be used in any React components. This command should be re-run any time a new non-JS or non-CSS asset is added to the project.
+
 Once everything is in place, **django-cra-helper** will make the following possible:
 
 ### Access React components in real-time from the CRA liveserver
