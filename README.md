@@ -129,7 +129,7 @@ For example,  a **logo.svg** file in the CRA project can be included in a Django
 <!-- This file is located at `/build/static/media/logo.svg` -->
 <img src="{% static static_media_logo_svg %}" height="40" width="40">
 ```
-> Note: This is optional! Static assets can still be included in the Django app's `/static/` directory and loaded them as usual. The special substitution mentioned above is only needed when reusing React assets outside of specific components.
+> Note: This is optional! Static assets can still be included in the Django app's `/static/` directory and loaded as usual. The special substitution mentioned above is only needed when reusing React assets outside of specific components.
 
 ## Accessing React Components via Django template contexts
 
