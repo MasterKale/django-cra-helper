@@ -2,6 +2,7 @@ import logging
 from unittest.mock import MagicMock, patch
 
 from django.test import TestCase
+from django.conf import settings
 from django.core.servers.basehttp import get_internal_wsgi_application
 from django.http import Http404
 
@@ -17,6 +18,7 @@ class TestCRAStaticFilesHandler(TestCase):
     def setUp(self):
         self.handler = CRAStaticFilesHandler(get_internal_wsgi_application())
         self._request = MagicMock(path='/fizz/buzz.jpg')
+        setattr(settings, 'DEBUG', True)
 
     def test_should_serve_when_file_exists(self):
         self.handler._should_handle = MagicMock(return_value=True)
@@ -44,3 +46,13 @@ class TestCRAStaticFilesHandler(TestCase):
         self.handler.get_response(self._request)
 
         mock_redirect.assert_called_with('http://foo.bar/fizz/buzz.jpg')
+
+    @patch('cra_helper.handlers.redirect')
+    def test_should_not_redirect_when_file_404s_in_prod(self, mock_redirect):
+        setattr(settings, 'DEBUG', False)
+        self.handler._should_handle = MagicMock(return_value=True)
+        self.handler.serve = MagicMock(side_effect=Http404)
+
+        self.handler.get_response(self._request)
+
+        self.assertFalse(mock_redirect.called)
