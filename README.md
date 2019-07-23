@@ -68,11 +68,14 @@ The last necessary setting is the name of the folder containing the CRA project 
 CRA_APP_NAME = 'cra-app'
 ```
 
-If for some reason the CRA liveserver does *not* serve on port 3000, the following setting can be added to `settings.py` to specify its actual port:
+If for some reason the CRA liveserver does *not* serve on localhost or port 3000, the following settings can be added to `settings.py` to specify its actual host and port:
 
 ```python
+CRA_HOST = '0.0.0.0'
 CRA_PORT = 9999
 ```
+
+> Note: if you don't set a value for `CRA_HOST` then **django-cra-helper will default to host `'localhost'`**
 
 > Note: if you don't set a value for `CRA_PORT` then **django-cra-helper** will default to port `3000`.
 
