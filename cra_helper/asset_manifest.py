@@ -42,8 +42,15 @@ def generate_manifest(is_server_live: bool, bundle_path: str, app_dir: str) -> d
                 logger.error('can\'t load static asset manifest: {}'.format(e))
                 return {}
 
+        # Older versions of Create-React-App had flat manifests. If a "files" property doesn't
+        # exist in the manifest JSON, then we're probably working with an older version of CRA
+        if data.get('files') is None:
+            manifest_items = data.items()
+        else:
+            manifest_items = data.get('files').items()
+
         # Generate relative paths to our bundled assets
-        for filename, path in data.items():
+        for filename, path in manifest_items:
             asset_key = filename.replace('.', '_')
             asset_key = asset_key.replace('/', '_')
 
