@@ -20,5 +20,7 @@ class CRAStaticFilesHandler(StaticFilesHandler):
                 # When the file 404's, redirect the request to the CRA liveserver
                 if settings.DEBUG:
                     return redirect('{}{}'.format(CRA_URL, request.path))
+                # Simply return the 404 outside of DEBUG mode (a.k.a. in production mode)
+                return e
 
         return super().get_response(request)
