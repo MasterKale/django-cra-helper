@@ -26,8 +26,8 @@ class TestGenerateManifest(TestCase):
     def test_returns_main_paths_if_cra_is_not_running(self):
         open_mock = mock_open(
             read_data='''{
-                "main.js": "static/js/main.1234.js",
-                "main.css": "static/css/main.1234.css"
+                "main.js": "/static/js/main.1234.js",
+                "main.css": "/static/css/main.1234.css"
             }'''
         )
         with patch('builtins.open', open_mock):
@@ -40,7 +40,8 @@ class TestGenerateManifest(TestCase):
         # Pretend this folder is STATIC_ROOT to emulate falling back and accessing the
         # collected asset-manifest.json
         _here_path = os.path.dirname(os.path.realpath(__file__))
-        setattr(settings, 'STATIC_ROOT', _here_path)
+        setattr(settings, 'BASE_DIR', _here_path)
+        setattr(settings, 'STATIC_ROOT', os.path.join(_here_path, 'static'))
         self.assertEqual(asset_manifest.generate_manifest(False, server_url, 'not_a_real_dir'), {
             'main_js': 'js/main.1234.js',
             'main_css': 'css/main.1234.css',
