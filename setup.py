@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='django-cra-helper',
-    version='1.0.2',
+    version='1.1.0',
     description='The missing piece of the Django + React puzzle',
     long_description=long_description,
     long_description_content_type="text/markdown",
