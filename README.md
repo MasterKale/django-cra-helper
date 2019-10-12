@@ -1,5 +1,7 @@
 # django-cra-helper
 
+[![PyPI version](https://badge.fury.io/py/django-cra-helper.svg)](https://pypi.org/project/django-cra-helper/)
+
 ## Introduction
 
 **django-cra-helper** is the missing link between **Django** and **create-react-app**. By adding this to your Django project, you can almost effortlessly inject your React components into your Django templates and initialize component props via Django context variables.
