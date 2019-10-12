@@ -13,6 +13,70 @@ logging.disable(logging.CRITICAL)
 
 server_url = 'http://foo.bar'
 
+# The originally-supported version of the asset manifest, used through react-scripts v2.1.8
+open_mock_v2 = mock_open(
+    read_data='''{
+        "main.css": "/static/css/main.80e572c9.chunk.css",
+        "main.js": "/static/js/main.ef0788cc.chunk.js",
+        "main.js.map": "/static/js/main.ef0788cc.chunk.js.map",
+        "runtime~main.js": "/static/js/runtime~main.a8a9905a.js",
+        "runtime~main.js.map": "/static/js/runtime~main.a8a9905a.js.map",
+        "static/js/2.597565cd.chunk.js": "/static/js/2.597565cd.chunk.js",
+        "static/js/2.597565cd.chunk.js.map": "/static/js/2.597565cd.chunk.js.map",
+        "index.html": "/index.html",
+        "precache-manifest.06aece505f403b62363ab3795d4669de.js": "/precache-manifest.06aece505f403b62363ab3795d4669de.js",
+        "service-worker.js": "/service-worker.js",
+        "static/css/main.80e572c9.chunk.css.map": "/static/css/main.80e572c9.chunk.css.map",
+        "static/media/logo.svg": "/static/media/logo.25bf045c.svg"
+    }'''
+)
+
+# A newer version of the asset manifest used in react-scripts v3.0.0 till v3.2.0
+open_mock_v3_1_2 = mock_open(
+    read_data='''{
+        "files": {
+            "main.css": "/static/css/main.b100e6da.chunk.css",
+            "main.js": "/static/js/main.5745ba44.chunk.js",
+            "main.js.map": "/static/js/main.5745ba44.chunk.js.map",
+            "runtime-main.js": "/static/js/runtime-main.e5179790.js",
+            "runtime-main.js.map": "/static/js/runtime-main.e5179790.js.map",
+            "static/js/2.24ceb05b.chunk.js": "/static/js/2.24ceb05b.chunk.js",
+            "static/js/2.24ceb05b.chunk.js.map": "/static/js/2.24ceb05b.chunk.js.map",
+            "index.html": "/index.html",
+            "precache-manifest.ed3a557b9335d6efb0f3f61d4c8baa40.js": "/precache-manifest.ed3a557b9335d6efb0f3f61d4c8baa40.js",
+            "service-worker.js": "/service-worker.js",
+            "static/css/main.b100e6da.chunk.css.map": "/static/css/main.b100e6da.chunk.css.map",
+            "static/media/logo.svg": "/static/media/logo.25bf045c.svg"
+        }
+    }'''
+)
+
+# A newer version of the asset manifest used in react-scripts v3.2+
+open_mock_v_3_2_0 = mock_open(
+    read_data='''{
+        "files": {
+            "main.css": "/static/css/main.b100e6da.chunk.css",
+            "main.js": "/static/js/main.f245946a.chunk.js",
+            "main.js.map": "/static/js/main.f245946a.chunk.js.map",
+            "runtime-main.js": "/static/js/runtime-main.7b0131e1.js",
+            "runtime-main.js.map": "/static/js/runtime-main.7b0131e1.js.map",
+            "static/js/2.7059510f.chunk.js": "/static/js/2.7059510f.chunk.js",
+            "static/js/2.7059510f.chunk.js.map": "/static/js/2.7059510f.chunk.js.map",
+            "index.html": "/index.html",
+            "precache-manifest.68f3de19261ab9bb69c0c6a58c46215e.js": "/precache-manifest.68f3de19261ab9bb69c0c6a58c46215e.js",
+            "service-worker.js": "/service-worker.js",
+            "static/css/main.b100e6da.chunk.css.map": "/static/css/main.b100e6da.chunk.css.map",
+            "static/media/logo.svg": "/static/media/logo.25bf045c.svg"
+        },
+        "entrypoints": [
+            "static/js/runtime-main.7b0131e1.js",
+            "static/js/2.7059510f.chunk.js",
+            "static/css/main.b100e6da.chunk.css",
+            "static/js/main.f245946a.chunk.js"
+        ]
+    }'''
+)
+
 
 class TestGenerateManifest(TestCase):
     def test_returns_dict(self):
@@ -23,17 +87,18 @@ class TestGenerateManifest(TestCase):
             'bundle_js': server_url
         })
 
-    def test_returns_main_paths_if_cra_is_not_running(self):
-        open_mock = mock_open(
-            read_data='''{
-                "main.js": "/static/js/main.1234.js",
-                "main.css": "/static/css/main.1234.css"
-            }'''
-        )
-        with patch('builtins.open', open_mock):
+    def test_returns_manifest_paths_when_cra_is_not_running(self):
+        with patch('builtins.open', open_mock_v2):
             self.assertEqual(asset_manifest.generate_manifest(False, server_url, '.'), {
-                'main_js': 'js/main.1234.js',
-                'main_css': 'css/main.1234.css',
+                'main_css': 'css/main.80e572c9.chunk.css',
+                'main_js': 'js/main.ef0788cc.chunk.js',
+                'main_js_map': 'js/main.ef0788cc.chunk.js.map',
+                'runtime_main_js': 'js/runtime~main.a8a9905a.js',
+                'runtime_main_js_map': 'js/runtime~main.a8a9905a.js.map',
+                'static_css_main_80e572c9_chunk_css_map': 'css/main.80e572c9.chunk.css.map',
+                'static_js_2_597565cd_chunk_js': 'js/2.597565cd.chunk.js',
+                'static_js_2_597565cd_chunk_js_map': 'js/2.597565cd.chunk.js.map',
+                'static_media_logo_svg': 'media/logo.25bf045c.svg'
             })
 
     def test_checks_static_root_when_manifest_missing_from_cra_build_dir(self):
@@ -51,3 +116,42 @@ class TestGenerateManifest(TestCase):
         open_mock = MagicMock(side_effect=Exception)
         with patch('builtins.open', open_mock):
             self.assertEqual(asset_manifest.generate_manifest(False, server_url, '.'), {})
+
+    def test_handles_manifest_v_3_1_2(self):
+        with patch('builtins.open', open_mock_v3_1_2):
+            self.assertEqual(asset_manifest.generate_manifest(False, server_url, '.'), {
+                'main_css': 'css/main.b100e6da.chunk.css',
+                'main_js': 'js/main.5745ba44.chunk.js',
+                'main_js_map': 'js/main.5745ba44.chunk.js.map',
+                'runtime_main_js': 'js/runtime-main.e5179790.js',
+                'runtime_main_js_map': 'js/runtime-main.e5179790.js.map',
+                'static_css_main_b100e6da_chunk_css_map': 'css/main.b100e6da.chunk.css.map',
+                'static_js_2_24ceb05b_chunk_js': 'js/2.24ceb05b.chunk.js',
+                'static_js_2_24ceb05b_chunk_js_map': 'js/2.24ceb05b.chunk.js.map',
+                'static_media_logo_svg': 'media/logo.25bf045c.svg'
+            })
+
+    def test_handles_manifest_v_3_2_0(self):
+        self.maxDiff = None
+        with patch('builtins.open', open_mock_v_3_2_0):
+            self.assertEqual(asset_manifest.generate_manifest(False, server_url, '.'), {
+                'main_css': 'css/main.b100e6da.chunk.css',
+                'main_js': 'js/main.f245946a.chunk.js',
+                'main_js_map': 'js/main.f245946a.chunk.js.map',
+                'runtime_main_js': 'js/runtime-main.7b0131e1.js',
+                'runtime_main_js_map': 'js/runtime-main.7b0131e1.js.map',
+                'static_css_main_b100e6da_chunk_css_map': 'css/main.b100e6da.chunk.css.map',
+                'static_js_2_7059510f_chunk_js': 'js/2.7059510f.chunk.js',
+                'static_js_2_7059510f_chunk_js_map': 'js/2.7059510f.chunk.js.map',
+                'static_media_logo_svg': 'media/logo.25bf045c.svg',
+                'entrypoints': {
+                    'css': [
+                        'css/main.b100e6da.chunk.css'
+                    ],
+                    'js': [
+                        'js/runtime-main.7b0131e1.js',
+                        'js/2.7059510f.chunk.js',
+                        'js/main.f245946a.chunk.js'
+                    ]
+                }
+            })
