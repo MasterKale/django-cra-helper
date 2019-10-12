@@ -5,6 +5,8 @@ import re
 
 from django.conf import settings
 
+from cra_helper.server_check import hosted_by_liveserver
+
 logger = logging.getLogger(__name__)
 
 _asset_filename = 'asset-manifest.json'
@@ -20,14 +22,34 @@ def clean_file_key(filename: str) -> str:
 
 # Create a dictionary of keys that can be passed to the `static` template tag to load CRA assets
 # from Django's STATIC_ROOT directory
-def generate_manifest(is_server_live: bool, bundle_path: str, app_dir: str) -> dict:
+def generate_manifest(cra_url: str, app_dir: str) -> dict:
+    manifest = {}
+
+    # The ability to access this file means the create-react-app liveserver is running
+    bundle_path = '{}/static/js/bundle.js'.format(cra_url)
+    # Check if Create-React-App live server is up and running
+    is_server_live = hosted_by_liveserver(bundle_path)
+
     # Prepare references to various files frontend
     if is_server_live:
-        return {
-            'bundle_js': bundle_path,
-        }
+        # Earlier versions of CRA included everything in a single bundle.js...
+        manifest['bundle_js'] = [
+            bundle_path,
+        ]
+
+        # ...while more recent versions of CRA use code-splitting and serve additional files
+        liveserver_bundles = [
+            # These two files will alternate being loaded into the page
+            '{}/static/js/0.chunk.js'.format(cra_url),
+            '{}/static/js/1.chunk.js'.format(cra_url),
+            # This bundle seems to contain some vendor files
+            '{}/static/js/main.chunk.js'.format(cra_url)
+        ]
+
+        for url in liveserver_bundles:
+            if hosted_by_liveserver(url):
+                manifest['bundle_js'].append(url)
     else:
-        _manifest = {}
         build_dir = os.path.join(app_dir, 'build')
 
         # Add the CRA static directory to STATICFILES_DIRS so collectstatic can grab files in there
@@ -69,14 +91,14 @@ def generate_manifest(is_server_live: bool, bundle_path: str, app_dir: str) -> d
             if static_base_path.match(path):
                 # Generate paths relative to our bundled assets
                 # Ex: /static/css/main.99358b65.chunk.css => css/main.99358b65.chunk.css
-                _manifest[clean_file_key(file_key)] = re.sub(static_base_path, '', path)
+                manifest[clean_file_key(file_key)] = re.sub(static_base_path, '', path)
 
         # Later versions of Create-React-App (starting with v3.2.0) will tell us which files to
         # load via an "entrypoints" array
         entrypoints = data.get('entrypoints')
         if entrypoints is not None:
             # Prepare to group entrypoint files by extension
-            _manifest['entrypoints'] = {
+            manifest['entrypoints'] = {
                 'js': [],
                 'css': [],
             };
@@ -89,11 +111,11 @@ def generate_manifest(is_server_live: bool, bundle_path: str, app_dir: str) -> d
                 mapped_manifest_items[path[1:]] = clean_file_key(file_key)
 
             for path in entrypoints:
-                rel_static_path = _manifest[mapped_manifest_items[path]]
+                rel_static_path = manifest[mapped_manifest_items[path]]
 
                 if path.endswith('.js'):
-                    _manifest['entrypoints']['js'].append(rel_static_path)
+                    manifest['entrypoints']['js'].append(rel_static_path)
                 elif path.endswith('.css'):
-                    _manifest['entrypoints']['css'].append(rel_static_path)
+                    manifest['entrypoints']['css'].append(rel_static_path)
 
-        return _manifest
+    return manifest
