@@ -11,7 +11,7 @@ from cra_helper import asset_manifest
 # Quiet down logging
 logging.disable(logging.CRITICAL)
 
-server_url = 'http://foo.bar'
+server_url = 'http://foo.bar:9999'
 
 # The originally-supported version of the asset manifest, used through react-scripts v2.1.8
 open_mock_v2 = mock_open(
@@ -80,16 +80,23 @@ open_mock_v_3_2_0 = mock_open(
 
 class TestGenerateManifest(TestCase):
     def test_returns_dict(self):
-        self.assertIsInstance(asset_manifest.generate_manifest(True, '', ''), dict)
+        self.assertIsInstance(asset_manifest.generate_manifest('', ''), dict)
 
-    def test_returns_bundle_url_if_cra_is_running(self):
-        self.assertEqual(asset_manifest.generate_manifest(True, server_url, ''), {
-            'bundle_js': server_url
-        })
+    @patch('cra_helper.asset_manifest.hosted_by_liveserver', return_value=True)
+    def test_returns_bundle_url_if_cra_is_running(self, mock_hosted_check):
+        with mock_hosted_check:
+            self.assertEqual(asset_manifest.generate_manifest(server_url, ''), {
+                'bundle_js': [
+                    'http://foo.bar:9999/static/js/bundle.js',
+                    'http://foo.bar:9999/static/js/0.chunk.js',
+                    'http://foo.bar:9999/static/js/1.chunk.js',
+                    'http://foo.bar:9999/static/js/main.chunk.js'
+                ]
+            })
 
     def test_returns_manifest_paths_when_cra_is_not_running(self):
         with patch('builtins.open', open_mock_v2):
-            self.assertEqual(asset_manifest.generate_manifest(False, server_url, '.'), {
+            self.assertEqual(asset_manifest.generate_manifest(server_url, '.'), {
                 'main_css': 'css/main.80e572c9.chunk.css',
                 'main_js': 'js/main.ef0788cc.chunk.js',
                 'main_js_map': 'js/main.ef0788cc.chunk.js.map',
@@ -107,7 +114,7 @@ class TestGenerateManifest(TestCase):
         _here_path = os.path.dirname(os.path.realpath(__file__))
         setattr(settings, 'BASE_DIR', _here_path)
         setattr(settings, 'STATIC_ROOT', os.path.join(_here_path, 'static'))
-        self.assertEqual(asset_manifest.generate_manifest(False, server_url, 'not_a_real_dir'), {
+        self.assertEqual(asset_manifest.generate_manifest(server_url, 'not_a_real_dir'), {
             'main_js': 'js/main.1234.js',
             'main_css': 'css/main.1234.css',
         })
@@ -115,11 +122,11 @@ class TestGenerateManifest(TestCase):
     def test_returns_empty_dict_if_file_not_found(self):
         open_mock = MagicMock(side_effect=Exception)
         with patch('builtins.open', open_mock):
-            self.assertEqual(asset_manifest.generate_manifest(False, server_url, '.'), {})
+            self.assertEqual(asset_manifest.generate_manifest(server_url, '.'), {})
 
     def test_handles_manifest_v_3_1_2(self):
         with patch('builtins.open', open_mock_v3_1_2):
-            self.assertEqual(asset_manifest.generate_manifest(False, server_url, '.'), {
+            self.assertEqual(asset_manifest.generate_manifest(server_url, '.'), {
                 'main_css': 'css/main.b100e6da.chunk.css',
                 'main_js': 'js/main.5745ba44.chunk.js',
                 'main_js_map': 'js/main.5745ba44.chunk.js.map',
@@ -134,7 +141,7 @@ class TestGenerateManifest(TestCase):
     def test_handles_manifest_v_3_2_0(self):
         self.maxDiff = None
         with patch('builtins.open', open_mock_v_3_2_0):
-            self.assertEqual(asset_manifest.generate_manifest(False, server_url, '.'), {
+            self.assertEqual(asset_manifest.generate_manifest(server_url, '.'), {
                 'main_css': 'css/main.b100e6da.chunk.css',
                 'main_js': 'js/main.f245946a.chunk.js',
                 'main_js_map': 'js/main.f245946a.chunk.js.map',
