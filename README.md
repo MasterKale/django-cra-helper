@@ -351,4 +351,4 @@ When all is said and done, React components should now render and be viewable in
 ## TODO
 
 * ~~Figure out how to get Django to auto-reload when the CRA liveserver reloads after code is updated.~~
-  * Supported as of v1.1.0
+  * Supported as of v1.2.0
