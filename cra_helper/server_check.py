@@ -1,7 +1,8 @@
-import logging
 from urllib import request, error as url_error
 
 from django.conf import settings
+
+from cra_helper.logging import logger
 
 
 def hosted_by_liveserver(file_url: str) -> bool:
@@ -10,13 +11,14 @@ def hosted_by_liveserver(file_url: str) -> bool:
         try:
             resp = request.urlopen(file_url)
             if resp.status == 200:
-                logging.info('CRA liveserver is running')
+                logger.debug('{} is being hosted by liveserver'.format(file_url))
                 return True
             else:
-                logging.warning('CRA liveserver is up but not serving files')
+                logger.warning('Create-React-App liveserver is up but not serving files')
                 return False
         except url_error.URLError as err:
-            logging.warning('CRA liveserver is not running')
+            logger.debug('{} is not being hosted by liveserver'.format(file_url))
             return False
     else:
+        logger.debug('Liveserver host check disabled in production')
         return False
