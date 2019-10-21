@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='django-cra-helper',
-    version='1.0.2',
+    version='1.1.0',
     description='The missing piece of the Django + React puzzle',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -27,6 +27,7 @@ setup(
     keywords='django react create-react-app integrate',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     install_requires=[
-        'bleach>=2'
+        'bleach>=2',
+        'django-proxy>=1.2.1',
     ],
 )
