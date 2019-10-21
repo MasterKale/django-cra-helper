@@ -1,13 +1,11 @@
 import os
-import logging
 import json
 import re
 
 from django.conf import settings
 
+from cra_helper.logging import logger
 from cra_helper.server_check import hosted_by_liveserver
-
-logger = logging.getLogger(__name__)
 
 _asset_filename = 'asset-manifest.json'
 
@@ -32,6 +30,7 @@ def generate_manifest(cra_url: str, app_dir: str) -> dict:
 
     # Prepare references to various files frontend
     if is_server_live:
+        logger.info('Create-React-App liveserver is running')
         # Earlier versions of CRA included everything in a single bundle.js...
         manifest['bundle_js'] = [
             bundle_path,
@@ -50,6 +49,7 @@ def generate_manifest(cra_url: str, app_dir: str) -> dict:
             if hosted_by_liveserver(url):
                 manifest['bundle_js'].append(url)
     else:
+        logger.info('Create-React-App liveserver is not running')
         build_dir = os.path.join(app_dir, 'build')
 
         # Add the CRA static directory to STATICFILES_DIRS so collectstatic can grab files in there
