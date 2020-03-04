@@ -1,3 +1,4 @@
+<!-- omit in toc -->
 # django-cra-helper
 
 [![PyPI version](https://badge.fury.io/py/django-cra-helper.svg)](https://pypi.org/project/django-cra-helper/)
@@ -10,14 +11,10 @@
   - [3. asset-manifest.json](#3-asset-manifestjson)
 - [Development](#development)
 - [Production](#production)
-  - [For older projects using up through `react-scripts@2.1.8`](#for-older-projects-using-up-through-react-scripts218)
-  - [For projects using `react-scripts@3.0.0` to `react-scripts@3.1.2`](#for-projects-using-react-scripts300-to-react-scripts312)
-  - [For projects using `react-scripts@3.2.0` on](#for-projects-using-react-scripts320-on)
 - [React in Django templates](#react-in-django-templates)
   - [Specifying React Components via template context](#specifying-react-components-via-template-context)
   - [Referencing React static files](#referencing-react-static-files)
 - [The Payoff Revealed](#the-payoff-revealed)
-- [TODO](#todo)
 
 ## Introduction
 
@@ -384,8 +381,3 @@ For example, a **logo.svg** file in the CRA project can be included in a Django 
 When all is said and done, React components should now render and be viewable in both the CRA liveserver and when served via Django. Here's an example of a slightly-modified CRA `App` component displayed in CRA (left) and Django (right):
 
 ![Comparison Shot](./side_by_side.png)
-
-## TODO
-
-* ~~Figure out how to get Django to auto-reload when the CRA liveserver reloads after code is updated.~~
-  * Supported as of v1.2.0
