@@ -98,7 +98,7 @@ CRA_PORT = 9999      # defaults to 3000
 
 ### 2. urls.py
 
-Hot-reloading support can be enabled by adding the following to your project or app's **urls.py** file:
+Hot-reloading support can be enabled by first adding the following to your project or app's **urls.py** file:
 
 ```python
 # import Django settings
@@ -115,12 +115,37 @@ urlpatterns = [...]
 # add a reverse-proxy view to help React in the Django view talk to Create-React-App
 if settings.DEBUG:
     proxy_urls = [
-        re_path(r'^sockjs-node/(?P<path>.*)$', proxy_cra_requests),
         re_path(r'^__webpack_dev_server__/(?P<path>.*)$', proxy_cra_requests),
     ]
     urlpatterns.extend(proxy_urls)
-
 ```
+
+Next, follow the instructions below that correspond to your project's version of `react-scripts`:
+
+<details>
+  <summary>For projects using <strong>react-scripts@&lt;3.3.0</strong></summary>
+
+  Add one more url to `proxy_urls` above:
+
+  ```python
+  proxy_urls = [
+      # ...snip...
+      re_path(r'^sockjs-node/(?P<path>.*)$', proxy_cra_requests),
+  ]
+  ```
+</details>
+
+<br>
+
+<details>
+  <summary>For projects using <strong>react-scripts@&gt;=3.3.0</strong></summary>
+
+  Create an **.env** file in the root of your Create-React-App folder with the following environment variable:
+
+  ```
+  WDS_SOCKET_PORT=3000
+  ```
+</details>
 
 ### 3. asset-manifest.json
 
