@@ -132,8 +132,6 @@ Next, follow the instructions below that correspond to your project's version of
   ```
 </details>
 
-<br>
-
 <details>
   <summary>For projects using <strong>react-scripts@&gt;=3.3.0</strong></summary>
 
@@ -206,8 +204,6 @@ Similar to the `bundle_js` template variable mentioned earlier, **django-cra-hel
   > There may be child dependencies of `react-scripts` that make it no longer possible to start apps that will function with the above instructions. In these cases, please try the instructions in the next section.
 </details>
 
-<br>
-
 <details>
   <summary>For projects using <strong>react-scripts@&gt;=3.0.0 to react-scripts@&lt;3.2.0</strong></summary>
 
@@ -223,8 +219,6 @@ Similar to the `bundle_js` template variable mentioned earlier, **django-cra-hel
 
   The naming of `static_js_2_9a95e042_chunk_js` above will differ from project to project. Unfortunately you'll have to manually confirm this value in your project's **asset-manifest.json** and update accordingly. It doesn't seem to change between builds, though, so it may not be a value you need to regularly update...
 </details>
-
-<br>
 
 <details>
   <summary>For projects using <strong>react-scripts@&gt;=3.2.0</strong></summary>
