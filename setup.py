@@ -27,7 +27,7 @@ setup(
     keywords='django react create-react-app integrate',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     install_requires=[
-        'bleach>=3.1.1',
+        'bleach>=3.1.4',
         'django-proxy>=1.2.1',
     ],
 )

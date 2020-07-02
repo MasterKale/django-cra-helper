@@ -84,8 +84,8 @@ def generate_manifest(cra_url: str, app_dir: str) -> dict:
             manifest_items = data.get('files').items()
 
         # Prepare a regex that'll help us detect and remove the leading "/static/" from manifest
-        # filepaths
-        static_base_path = re.compile(r'^/static/', re.IGNORECASE)
+        # filepaths. Support relative path prefixes that might also prefix "/static/".
+        static_base_path = re.compile(r'^(?:/[\w.-]+)?/static/', re.IGNORECASE)
         for file_key, path in manifest_items:
             # Don't include index.html, serviceWorker.js, etc...
             if static_base_path.match(path):
@@ -106,9 +106,13 @@ def generate_manifest(cra_url: str, app_dir: str) -> dict:
             # Map manifest files by their path
             mapped_manifest_items = {}
             for file_key, path in manifest_items:
-                # Paths in "entrypoints" don't start with a leading "/" so we have to trim it off
-                # with the `[1:]`
-                mapped_manifest_items[path[1:]] = clean_file_key(file_key)
+                # Paths in "entrypoints" in asset-manifest.json don't include the relative path
+                # that might be set to "homepage" in package.json. Convert the asset file paths in
+                # "files" in asset-manifest.json from `/frontend/static/...` to `static/...` so
+                # that our truncated manifest file paths generated above can be matched to
+                # the "entrypoints" paths
+                normalized_path = re.sub(static_base_path, 'static/', path)
+                mapped_manifest_items[normalized_path] = clean_file_key(file_key)
 
             for path in entrypoints:
                 rel_static_path = manifest[mapped_manifest_items[path]]
