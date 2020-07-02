@@ -77,6 +77,33 @@ open_mock_v_3_2_0 = mock_open(
     }'''
 )
 
+# Build output from a CRA project with `"homepage": "/frontend"` set in package.json
+open_mock_v3_4_0_homepage = mock_open(
+    read_data='''{
+        "files": {
+            "main.css": "/frontend/static/css/main.d1b05096.chunk.css",
+            "main.js": "/frontend/static/js/main.86964f0e.chunk.js",
+            "main.js.map": "/frontend/static/js/main.86964f0e.chunk.js.map",
+            "runtime-main.js": "/frontend/static/js/runtime-main.d13328da.js",
+            "runtime-main.js.map": "/frontend/static/js/runtime-main.d13328da.js.map",
+            "static/js/2.95e01bf1.chunk.js": "/frontend/static/js/2.95e01bf1.chunk.js",
+            "static/js/2.95e01bf1.chunk.js.map": "/frontend/static/js/2.95e01bf1.chunk.js.map",
+            "index.html": "/frontend/index.html",
+            "precache-manifest.9548cd4af84bd065cd70d970ca469612.js": "/frontend/precache-manifest.9548cd4af84bd065cd70d970ca469612.js",
+            "service-worker.js": "/frontend/service-worker.js",
+            "static/css/main.d1b05096.chunk.css.map": "/frontend/static/css/main.d1b05096.chunk.css.map",
+            "static/js/2.95e01bf1.chunk.js.LICENSE.txt": "/frontend/static/js/2.95e01bf1.chunk.js.LICENSE.txt",
+            "static/media/logo.svg": "/frontend/static/media/logo.5d5d9eef.svg"
+        },
+        "entrypoints": [
+            "static/js/runtime-main.d13328da.js",
+            "static/js/2.95e01bf1.chunk.js",
+            "static/css/main.d1b05096.chunk.css",
+            "static/js/main.86964f0e.chunk.js"
+        ]
+    }'''
+)
+
 
 class TestGenerateManifest(TestCase):
     def test_returns_dict(self):
@@ -159,6 +186,32 @@ class TestGenerateManifest(TestCase):
                         'js/runtime-main.7b0131e1.js',
                         'js/2.7059510f.chunk.js',
                         'js/main.f245946a.chunk.js'
+                    ]
+                }
+            })
+
+    def test_handles_manifest_v_3_4_0_homepage(self):
+        self.maxDiff = None
+        with patch('builtins.open', open_mock_v3_4_0_homepage):
+            self.assertEqual(asset_manifest.generate_manifest(server_url, '.'), {
+                'main_css': 'css/main.d1b05096.chunk.css',
+                'main_js': 'js/main.86964f0e.chunk.js',
+                'main_js_map': 'js/main.86964f0e.chunk.js.map',
+                'runtime_main_js': 'js/runtime-main.d13328da.js',
+                'runtime_main_js_map': 'js/runtime-main.d13328da.js.map',
+                'static_css_main_d1b05096_chunk_css_map': 'css/main.d1b05096.chunk.css.map',
+                'static_js_2_95e01bf1_chunk_js': 'js/2.95e01bf1.chunk.js',
+                'static_js_2_95e01bf1_chunk_js_map': 'js/2.95e01bf1.chunk.js.map',
+                'static_js_2_95e01bf1_chunk_js_LICENSE_txt': 'js/2.95e01bf1.chunk.js.LICENSE.txt',
+                'static_media_logo_svg': 'media/logo.5d5d9eef.svg',
+                'entrypoints': {
+                    'css': [
+                        'css/main.d1b05096.chunk.css'
+                    ],
+                    'js': [
+                        'js/runtime-main.d13328da.js',
+                        'js/2.95e01bf1.chunk.js',
+                        'js/main.86964f0e.chunk.js'
                     ]
                 }
             })
