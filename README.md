@@ -260,7 +260,7 @@ Before: /static/js/main.319f1c51.chunk.js
 After:  /frontend/static/js/main.319f1c51.chunk.js
 ```
 
-**To make sure the React imports/assets/etc... can be found even when hosted through Django, you'll also need to update `STATIC_URL` in Django's **settings.py** to include the path prefix:**
+**To make sure the React imports/assets/etc... can be found even when hosted through Django, you'll also need to update `STATIC_URL` in Django's settings.py to include the path prefix:**
 
 ```py
 STATIC_URL = '/frontend/static/'
