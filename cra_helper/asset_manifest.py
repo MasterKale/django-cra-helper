@@ -84,7 +84,7 @@ def generate_manifest(cra_url: str, app_dir: str) -> dict:
             manifest_items = data.get('files').items()
 
         # Prepare a regex that'll help us detect and remove the leading "/static/" from manifest
-        # filepaths
+        # filepaths. Support relative path prefixes that might also prefix "/static/".
         static_base_path = re.compile(r'^(?:/[\w.-]+)?/static/', re.IGNORECASE)
         for file_key, path in manifest_items:
             # Don't include index.html, serviceWorker.js, etc...
