@@ -114,6 +114,7 @@ urlpatterns = [...]
 if settings.DEBUG:
     proxy_urls = [
         re_path(r'^__webpack_dev_server__/(?P<path>.*)$', proxy_cra_requests),
+        re_path(r'^(?P<path>.+\.hot-update\.(js|json|js\.map))$', proxy_cra_requests),
     ]
     urlpatterns.extend(proxy_urls)
 ```
