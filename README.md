@@ -11,6 +11,7 @@
   - [3. asset-manifest.json](#3-asset-manifestjson)
 - [Development](#development)
 - [Production](#production)
+  - [Supporting CRA's relative paths](#supporting-cras-relative-paths)
 - [React in Django templates](#react-in-django-templates)
   - [Specifying React Components via template context](#specifying-react-components-via-template-context)
   - [Referencing React static files](#referencing-react-static-files)
@@ -239,7 +240,33 @@ Similar to the `bundle_js` template variable mentioned earlier, **django-cra-hel
   > NOTE: These JavaScript and CSS files should be arranged in an order required for the site to load; the ultimate order is derived from the order present in **asset-manifest.json**.
 </details>
 
+### Supporting CRA's relative paths
 
+CRA allows developers to specify a [relative sub-folder for their site to be hosted from](https://create-react-app.dev/docs/deployment/#building-for-relative-paths) via the `"homepage"` property in **package.json**:
+
+```json
+{
+  "name": "cra-app",
+  "version": "0.1.0",
+  "homepage": "/frontend",
+  ...
+}
+```
+
+When this value is set, `npm run build` will output assets and an **asset-manifest.json** with paths prepended with the path prefix:
+
+```
+Before: /static/js/main.319f1c51.chunk.js
+After:  /frontend/static/js/main.319f1c51.chunk.js
+```
+
+**To make sure the React imports/assets/etc... can be found even when hosted through Django, you'll also need to update `STATIC_URL` in Django's **settings.py** to include the path prefix:**
+
+```py
+STATIC_URL = '/frontend/static/'
+```
+
+Once these changes are made then the React app should be able to find everything it needs to function.
 
 ## React in Django templates
 
