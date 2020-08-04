@@ -14,6 +14,7 @@
   - [Supporting CRA's relative paths](#supporting-cras-relative-paths)
 - [React in Django templates](#react-in-django-templates)
   - [Specifying React Components via template context](#specifying-react-components-via-template-context)
+  - [Combining Django and React routes](#combining-django-and-react-routes)
   - [Referencing React static files](#referencing-react-static-files)
 - [The Payoff Revealed](#the-payoff-revealed)
 
@@ -328,7 +329,7 @@ def index(request):
     return render(request, 'index.html', context)
 ```
 
-Below is the Django app view's `index.html` template that can render across multiple versions of `react-scripts` (intended only for demo purposes with a fresh CRA app):
+Below is the Django app view's **index.html** template that can render across multiple versions of `react-scripts` (intended only for demo purposes with a fresh CRA app):
 
 ```html
 {% load static %}
@@ -386,51 +387,64 @@ window.props = {"env": "Django"};
 ```
 Finally, `window.reactRoot` specifies the container element that the React component should be rendered into. Setting a value for this is only required if the container's `id` is *not* **"root"** (the same ID assigned to the container `<div>` in the CRA project's `index.html`.)
 
-###  Adding routes to use both react-router-dom and template view
-If you wish to use routes from django's routing (urls.py) and react-router-dom this is a sample urls.py from your app/project:
+### Combining Django and React routes
 
+In some scenarios it may be desirable to leverage React client-side routes alongside typical Django routes. Fortunately it's simple to define an additional "catch-all" Django route that will gracefully handle URLs that should be handled by routing in the React app.
+
+In a typical client-side routing setup a React app may have the following routes defined:
+
+```js
+import { BrowserRouter as Router, Switch, Route, NavLink, Redirect } from 'react-router-dom';
+
+const App = () => (
+  <Router>
+    <ul>
+      <li><NavLink to='/'>To Home</NavLink></li>
+      <li><NavLink to='/foo'>To Foo</NavLink></li>
+      <li><NavLink to='/bar'>To Bar</NavLink></li>
+    </ul>
+    <Switch>
+      <Route path='/foo'>foo</Route>
+      <Route path='/bar'>bar</Route>
+      <Route exact path='/'>home</Route>
+      <Route path='*'>
+        <Redirect to='/' />
+      </Route>
+    </Switch>
+  </Router>
+);
 ```
-# /proj/django-sample-app/django-sample-app/frontend/urls.py
-from django.urls import path
-from . import views
-from django.conf.urls import include, url
+
+On the Django side of things, the following routes can be defined in a `frontend` app's **frontend/urls.py** that both point to an `index` view that renders **frontend/template/index.html**:
+
+```py
+from django.urls import path, re_path, include
+
+from .views import index
 
 urlpatterns = [
-    path('', views.index), # Adds default index template in routes
-    url(r'^.*/$', views.index) #Enables django to lookup unknown routes in react-router-dom
+    # Default index template to render index.html
+    path('', index),
+    # Helps Django pass unknown routes to the client-side router
+    re_path(r'^.*/$', index)
 ]
 ```
 
-Now in in you react app you can specifcy routes like this using react-router-dom:
+These URLs can then be `include`'d in the project's root **urls.py**:
 
-```
-const App = () => (
-  <BrowserRouter>
-    <Provider store={store}>
-      <Fragment>
-        <div className="App">
-          <Switch>
-            <Route exact path={"/alert"} component={Alert} />
-            <Route exact path={"/login"} component={Login} />
-            <Route exact path={"/home"} component={Home} />
-            <Route path={"/"} component={Layout} />
-          </Switch>
-        </div>
-      </Fragment>
-    </Provider>
-  </BrowserRouter>
-);
-```
-Please note that you need to load them in projects main urls.py.
+```py
+from django.urls import path, include
 
-```
-# /proj/django-sample-app/django-sample-app/urls.py
 urlpatterns = [
-.....
- path('', include('frontend.urls')),
- ]
- ```
-Please take note order in your main 
+    # ...other routes...
+    path('', include('frontend.urls')),
+]
+```
+
+> Note: If your routes aren't working, make sure `'frontend'` has been added to `INSTALLED_APPS` in **settings.py**
+
+With both paths in place Django will now load the React app when it attempts to handle a path that is only defined as a client-side route.
+
 ### Referencing React static files
 
 Other assets bundled by CRA, including image assets, can be accessed in templates by substituting `/`, `.`, `~`, and `-` in their filepaths with `_`. **django-cra-helper** adds every entry in **asset-manifest.json** to the base context, using these substitution rules to accomodate Django's `static` tag.
