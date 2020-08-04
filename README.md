@@ -415,7 +415,7 @@ const App = () => (
 );
 ```
 
-On the Django side of things, the following routes can be defined in a `frontend` app's **frontend/urls.py** that both point to an `index` view that renders **frontend/template/index.html**:
+On the Django side of things, the following routes can be defined in a `frontend` app's **frontend/urls.py** that both point to an `index` view that renders **frontend/templates/index.html**:
 
 ```py
 from django.urls import path, re_path, include
