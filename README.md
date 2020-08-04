@@ -386,6 +386,51 @@ window.props = {"env": "Django"};
 ```
 Finally, `window.reactRoot` specifies the container element that the React component should be rendered into. Setting a value for this is only required if the container's `id` is *not* **"root"** (the same ID assigned to the container `<div>` in the CRA project's `index.html`.)
 
+###  Adding routes to use both react-router-dom and template view
+If you wish to use routes from django's routing (urls.py) and react-router-dom this is a sample urls.py from your app/project:
+
+```
+# /proj/django-sample-app/django-sample-app/frontend/urls.py
+from django.urls import path
+from . import views
+from django.conf.urls import include, url
+
+urlpatterns = [
+    path('', views.index), # Adds default index template in routes
+    url(r'^.*/$', views.index) #Enables django to lookup unknown routes in react-router-dom
+]
+```
+
+Now in in you react app you can specifcy routes like this using react-router-dom:
+
+```
+const App = () => (
+  <BrowserRouter>
+    <Provider store={store}>
+      <Fragment>
+        <div className="App">
+          <Switch>
+            <Route exact path={"/alert"} component={Alert} />
+            <Route exact path={"/login"} component={Login} />
+            <Route exact path={"/home"} component={Home} />
+            <Route path={"/"} component={Layout} />
+          </Switch>
+        </div>
+      </Fragment>
+    </Provider>
+  </BrowserRouter>
+);
+```
+Please note that you need to load them in projects main urls.py.
+
+```
+# /proj/django-sample-app/django-sample-app/urls.py
+urlpatterns = [
+.....
+ path('', include('frontend.urls')),
+ ]
+ ```
+Please take note order in your main 
 ### Referencing React static files
 
 Other assets bundled by CRA, including image assets, can be accessed in templates by substituting `/`, `.`, `~`, and `-` in their filepaths with `_`. **django-cra-helper** adds every entry in **asset-manifest.json** to the base context, using these substitution rules to accomodate Django's `static` tag.
