@@ -70,13 +70,12 @@ TEMPLATES = [
 ]
 ```
 
-Additionally, the following `STATICFILES_FINDERS` list will also need to be added to `settings.py`:
+Additionally, the following `STATICFILES_FINDERS` list must be added to `settings.py`:
 
 ```python
 STATICFILES_FINDERS = [
-    # Django defaults
+    # Required for CRAManifestFinder below to work
     'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     # A finder to pull in asset-manifest.json
     'cra_helper.finders.CRAManifestFinder',
 ]
