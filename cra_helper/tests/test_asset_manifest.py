@@ -117,6 +117,7 @@ class TestGenerateManifest(TestCase):
                     'http://foo.bar:9999/static/js/bundle.js',
                     'http://foo.bar:9999/static/js/0.chunk.js',
                     'http://foo.bar:9999/static/js/1.chunk.js',
+                    'http://foo.bar:9999/static/js/vendors~main.chunk.js',
                     'http://foo.bar:9999/static/js/main.chunk.js'
                 ]
             })
