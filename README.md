@@ -261,11 +261,14 @@ Before: /static/js/main.319f1c51.chunk.js
 After:  /frontend/static/js/main.319f1c51.chunk.js
 ```
 
-**To make sure the React imports/assets/etc... can be found even when hosted through Django, you'll also need to update `STATIC_URL` in Django's settings.py to include the path prefix:**
+To make sure the React imports/assets/etc... can be found even when hosted through Django, you'll also need to update `STATIC_URL` in Django's settings.py to include the path prefix:
 
 ```py
 STATIC_URL = '/frontend/static/'
+CRA_PACKAGE_JSON_HOMEPAGE = '/frontend'
 ```
+
+The value set to `CRA_PACKAGE_JSON_HOMEPAGE` above should match the value of `"homepage"` in **package.json** so that **django-cra-helper** can find the CRA liveserver and redirect appropriately:
 
 Once these changes are made then the React app should be able to find everything it needs to function.
 
