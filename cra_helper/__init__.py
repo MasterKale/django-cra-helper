@@ -41,7 +41,6 @@ if hasattr(settings, 'CRA_PACKAGE_JSON_HOMEPAGE'):
     # Should result in something like 'http://localhost:3000/frontend'
     _cra_liveserver_url = '{}/{}'.format(_cra_liveserver_url, relative_path)
 
-
 # The path to the CRA project directory, relative to the Django project's base directory
 CRA_FS_APP_DIR = os.path.join(settings.BASE_DIR, CRA_APP_NAME)
 
