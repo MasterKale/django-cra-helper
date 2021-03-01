@@ -5,7 +5,7 @@
 **Changes:**
 
 - Add liveserver support for `react-scripts@4.0.0` and up
-- Added new `CRA_PACKAGE_JSON_HOMEPAGE` setting for Django **settings.py** to help contact liveserver when the Create-React-App project's **package.json** contains a value for `"homepage"`.
+- Add new `CRA_PACKAGE_JSON_HOMEPAGE` setting for Django **settings.py** to help contact liveserver when the Create-React-App project's **package.json** contains a value for `"homepage"`.
 
 **Breaking Changes:**
 - Remove `json` template tag for Django's built-in `json_script`.
