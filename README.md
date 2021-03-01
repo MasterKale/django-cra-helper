@@ -185,25 +185,23 @@ React assets will be included with the other static assets in the `settings.STAT
 
 Similar to the `bundle_js` template variable mentioned earlier, **django-cra-helper** includes numerous other template variables when the CRA liveserver is _not_ running:
 
-<details>
-  <summary>For older projects using <strong>react-scripts@&lt;=2.1.8</strong></summary>
+<details open>
+  <summary>For projects using <strong>react-scripts@&gt;=3.2.0</strong></summary>
 
-  The two most important variables are `main_js` and `main_css`. These can be injected into the page via a typical call to `{% static %}` in the template:
+  Starting with `react-scripts@3.2.0`, a new `entrypoints` property can be found in **asset-manifest.json**. This contains an array of files that **django-cra-helper** makes available in templates to more easily inject these files via new `entrypoints.css` and `entrypoints.js` arrays. These **replace** the `main_css` and `main_js` values used above:
 
   ```html
-  {% if main_css %}
-  <link href="{% static main_css %}" rel="stylesheet">
-  {% endif %}
+  {% for file in entrypoints.css %}
+  <link href="{% static file %}" rel="stylesheet">
+  {% endfor %}
   ```
   ```html
-  {% if main_js %}
-  <script type="text/javascript" src="{% static main_js %}"></script>
-  {% endif %}
+  {% for file in entrypoints.js %}
+  <script type="text/javascript" src="{% static file %}"></script>
+  {% endfor %}
   ```
 
-  > NOTE: Recent attempts at building a fresh CRA project with `react-scripts@2.1.8` were unsuccessful in recreating SPAs that allowed for just a single `main_js`. `npm run build`-produced artifacts functioned almost identically to artifacts generated the same as `react-scripts@3.1.2`, detailed below.
-  >
-  > There may be child dependencies of `react-scripts` that make it no longer possible to start apps that will function with the above instructions. In these cases, please try the instructions in the next section.
+  > NOTE: These JavaScript and CSS files should be arranged in an order required for the site to load; the ultimate order is derived from the order present in **asset-manifest.json**.
 </details>
 
 <details>
@@ -223,22 +221,24 @@ Similar to the `bundle_js` template variable mentioned earlier, **django-cra-hel
 </details>
 
 <details>
-  <summary>For projects using <strong>react-scripts@&gt;=3.2.0</strong></summary>
+  <summary>For older projects using <strong>react-scripts@&lt;=2.1.8</strong></summary>
 
-  Starting with `react-scripts@3.2.0`, a new `entrypoints` property can be found in **asset-manifest.json**. This contains an array of files that **django-cra-helper** makes available in templates to more easily inject these files via new `entrypoints.css` and `entrypoints.js` arrays. These **replace** the `main_css` and `main_js` values used above:
+  The two most important variables are `main_js` and `main_css`. These can be injected into the page via a typical call to `{% static %}` in the template:
 
   ```html
-  {% for file in entrypoints.css %}
-  <link href="{% static file %}" rel="stylesheet">
-  {% endfor %}
+  {% if main_css %}
+  <link href="{% static main_css %}" rel="stylesheet">
+  {% endif %}
   ```
   ```html
-  {% for file in entrypoints.js %}
-  <script type="text/javascript" src="{% static file %}"></script>
-  {% endfor %}
+  {% if main_js %}
+  <script type="text/javascript" src="{% static main_js %}"></script>
+  {% endif %}
   ```
 
-  > NOTE: These JavaScript and CSS files should be arranged in an order required for the site to load; the ultimate order is derived from the order present in **asset-manifest.json**.
+  > NOTE: Recent attempts at building a fresh CRA project with `react-scripts@2.1.8` were unsuccessful in recreating SPAs that allowed for just a single `main_js`. `npm run build`-produced artifacts functioned almost identically to artifacts generated the same as `react-scripts@3.1.2`, detailed below.
+  >
+  > There may be child dependencies of `react-scripts` that make it no longer possible to start apps that will function with the above instructions. In these cases, please try the instructions in the next section.
 </details>
 
 ### Supporting CRA's relative paths
