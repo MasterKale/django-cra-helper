@@ -41,6 +41,8 @@ def generate_manifest(cra_url: str, app_dir: str) -> dict:
             # These two files will alternate being loaded into the page
             '{}/static/js/0.chunk.js'.format(cra_url),
             '{}/static/js/1.chunk.js'.format(cra_url),
+            # react-scripts@4.0.0+
+            '{}/static/js/vendors~main.chunk.js'.format(cra_url),
             # This bundle seems to contain some vendor files
             '{}/static/js/main.chunk.js'.format(cra_url)
         ]

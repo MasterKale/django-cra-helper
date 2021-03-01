@@ -26,8 +26,23 @@ if hasattr(settings, 'CRA_APP_NAME'):
 else:
     CRA_APP_NAME = 'react'
 
+# Be mindful of CRA's relative paths when bootstraping from the CRA liveserver
+_cra_liveserver_url = CRA_URL
+if hasattr(settings, 'CRA_PACKAGE_JSON_HOMEPAGE'):
+    relative_path = str(settings.CRA_PACKAGE_JSON_HOMEPAGE)
+    # Normalize homepage path if it starts with / or ends with /
+    if relative_path.startswith('/'):
+        # Strip leading /
+        relative_path = relative_path[1:]
+    if relative_path.endswith('/'):
+        # Strip trailing /
+        relative_path = relative_path[0:-1]
+
+    # Should result in something like 'http://localhost:3000/frontend'
+    _cra_liveserver_url = '{}/{}'.format(_cra_liveserver_url, relative_path)
+
 # The path to the CRA project directory, relative to the Django project's base directory
 CRA_FS_APP_DIR = os.path.join(settings.BASE_DIR, CRA_APP_NAME)
 
 # A list of entries in CRA's build bundle's
-STATIC_ASSET_MANIFEST = generate_manifest(CRA_URL, CRA_FS_APP_DIR)
+STATIC_ASSET_MANIFEST = generate_manifest(_cra_liveserver_url, CRA_FS_APP_DIR)

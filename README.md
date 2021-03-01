@@ -185,25 +185,23 @@ React assets will be included with the other static assets in the `settings.STAT
 
 Similar to the `bundle_js` template variable mentioned earlier, **django-cra-helper** includes numerous other template variables when the CRA liveserver is _not_ running:
 
-<details>
-  <summary>For older projects using <strong>react-scripts@&lt;=2.1.8</strong></summary>
+<details open>
+  <summary>For projects using <strong>react-scripts@&gt;=3.2.0</strong></summary>
 
-  The two most important variables are `main_js` and `main_css`. These can be injected into the page via a typical call to `{% static %}` in the template:
+  Starting with `react-scripts@3.2.0`, a new `entrypoints` property can be found in **asset-manifest.json**. This contains an array of files that **django-cra-helper** makes available in templates to more easily inject these files via new `entrypoints.css` and `entrypoints.js` arrays:
 
   ```html
-  {% if main_css %}
-  <link href="{% static main_css %}" rel="stylesheet">
-  {% endif %}
+  {% for file in entrypoints.css %}
+  <link href="{% static file %}" rel="stylesheet">
+  {% endfor %}
   ```
   ```html
-  {% if main_js %}
-  <script type="text/javascript" src="{% static main_js %}"></script>
-  {% endif %}
+  {% for file in entrypoints.js %}
+  <script type="text/javascript" src="{% static file %}"></script>
+  {% endfor %}
   ```
 
-  > NOTE: Recent attempts at building a fresh CRA project with `react-scripts@2.1.8` were unsuccessful in recreating SPAs that allowed for just a single `main_js`. `npm run build`-produced artifacts functioned almost identically to artifacts generated the same as `react-scripts@3.1.2`, detailed below.
-  >
-  > There may be child dependencies of `react-scripts` that make it no longer possible to start apps that will function with the above instructions. In these cases, please try the instructions in the next section.
+  > NOTE: These JavaScript and CSS files should be arranged in an order required for the site to load; the ultimate order is derived from the order present in **asset-manifest.json**.
 </details>
 
 <details>
@@ -223,22 +221,24 @@ Similar to the `bundle_js` template variable mentioned earlier, **django-cra-hel
 </details>
 
 <details>
-  <summary>For projects using <strong>react-scripts@&gt;=3.2.0</strong></summary>
+  <summary>For older projects using <strong>react-scripts@&lt;=2.1.8</strong></summary>
 
-  Starting with `react-scripts@3.2.0`, a new `entrypoints` property can be found in **asset-manifest.json**. This contains an array of files that **django-cra-helper** makes available in templates to more easily inject these files via new `entrypoints.css` and `entrypoints.js` arrays. These **replace** the `main_css` and `main_js` values used above:
+  The two most important variables are `main_js` and `main_css`. These can be injected into the page via a typical call to `{% static %}` in the template:
 
   ```html
-  {% for file in entrypoints.css %}
-  <link href="{% static file %}" rel="stylesheet">
-  {% endfor %}
+  {% if main_css %}
+  <link href="{% static main_css %}" rel="stylesheet">
+  {% endif %}
   ```
   ```html
-  {% for file in entrypoints.js %}
-  <script type="text/javascript" src="{% static file %}"></script>
-  {% endfor %}
+  {% if main_js %}
+  <script type="text/javascript" src="{% static main_js %}"></script>
+  {% endif %}
   ```
 
-  > NOTE: These JavaScript and CSS files should be arranged in an order required for the site to load; the ultimate order is derived from the order present in **asset-manifest.json**.
+  > NOTE: Recent attempts at building a fresh CRA project with `react-scripts@2.1.8` were unsuccessful in recreating SPAs that allowed for just a single `main_js`. `npm run build`-produced artifacts functioned almost identically to artifacts generated the same as `react-scripts@3.1.2`, detailed below.
+  >
+  > There may be child dependencies of `react-scripts` that make it no longer possible to start apps that will function with the above instructions. In these cases, please try the instructions in the next section.
 </details>
 
 ### Supporting CRA's relative paths
@@ -261,11 +261,14 @@ Before: /static/js/main.319f1c51.chunk.js
 After:  /frontend/static/js/main.319f1c51.chunk.js
 ```
 
-**To make sure the React imports/assets/etc... can be found even when hosted through Django, you'll also need to update `STATIC_URL` in Django's settings.py to include the path prefix:**
+To make sure the React imports/assets/etc... can be found even when hosted through Django, you'll also need to update `STATIC_URL` in Django's settings.py to include the path prefix:
 
 ```py
 STATIC_URL = '/frontend/static/'
+CRA_PACKAGE_JSON_HOMEPAGE = '/frontend'
 ```
+
+The value set to `CRA_PACKAGE_JSON_HOMEPAGE` above should match the value of `"homepage"` in **package.json** so that **django-cra-helper** can find the CRA liveserver and redirect appropriately:
 
 Once these changes are made then the React app should be able to find everything it needs to function.
 
@@ -332,7 +335,6 @@ Below is the Django app view's **index.html** template that can render across mu
 
 ```html
 {% load static %}
-{% load cra_helper_tags %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -353,9 +355,13 @@ Below is the Django app view's **index.html** template that can render across mu
   <body>
     <div id="react">Loading...</div>
 
+    {{ props | json_script:"react-props" }}
+
     <script>
       window.component = '{{ component }}';
-      window.props = {{ props | json }};
+      window.props = JSON.parse(
+        document.getElementById('react-props').textContent
+      );
       window.reactRoot = document.getElementById('react');
     </script>
     {% if bundle_js %}
@@ -378,12 +384,8 @@ Below is the Django app view's **index.html** template that can render across mu
 ```
 The context's `component` and `props` are bound to `window.component` and `window.props` respectively.
 
-Note the use of the `json` filter when setting `windows.props`! `{% load cra_helper_tags %}` provides this filter as a way to easily sanitize and convert a Python `dict` to a Javascript `Object`. The View context prepared above thus renders to the following typical Javascript Object:
+Note the use of the `json_script` filter when setting `windows.props`. [Django provides this filter](https://docs.djangoproject.com/en/3.1/ref/templates/builtins/#json-script) as a way to easily sanitize and convert a Python `dict` to a Javascript `Object`. The contents of the injected `<script>` tag can be run through `JSON.parse()` to safely assign it to a variable.
 
-```js
-// This is what is returned in the rendered HTML
-window.props = {"env": "Django"};
-```
 Finally, `window.reactRoot` specifies the container element that the React component should be rendered into. Setting a value for this is only required if the container's `id` is *not* **"root"** (the same ID assigned to the container `<div>` in the CRA project's `index.html`.)
 
 ### Combining Django and React routes
