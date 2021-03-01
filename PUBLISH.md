@@ -9,7 +9,7 @@ Because it's always so long between releases...
 Twine can be installed system-wide without using `sudo`:
 
 ```sh
-$> pip install --user --upgrade twine
+$> pip install --user --upgrade twine wheel
 ```
 
 ## Step-by-step
