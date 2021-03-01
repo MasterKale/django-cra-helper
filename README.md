@@ -188,7 +188,7 @@ Similar to the `bundle_js` template variable mentioned earlier, **django-cra-hel
 <details open>
   <summary>For projects using <strong>react-scripts@&gt;=3.2.0</strong></summary>
 
-  Starting with `react-scripts@3.2.0`, a new `entrypoints` property can be found in **asset-manifest.json**. This contains an array of files that **django-cra-helper** makes available in templates to more easily inject these files via new `entrypoints.css` and `entrypoints.js` arrays. These **replace** the `main_css` and `main_js` values used above:
+  Starting with `react-scripts@3.2.0`, a new `entrypoints` property can be found in **asset-manifest.json**. This contains an array of files that **django-cra-helper** makes available in templates to more easily inject these files via new `entrypoints.css` and `entrypoints.js` arrays:
 
   ```html
   {% for file in entrypoints.css %}
