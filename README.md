@@ -335,7 +335,6 @@ Below is the Django app view's **index.html** template that can render across mu
 
 ```html
 {% load static %}
-{% load cra_helper_tags %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -356,9 +355,13 @@ Below is the Django app view's **index.html** template that can render across mu
   <body>
     <div id="react">Loading...</div>
 
+    {{ props | json_script:"react-props" }}
+
     <script>
       window.component = '{{ component }}';
-      window.props = {{ props | json }};
+      window.props = JSON.parse(
+        document.getElementById('react-props').textContent
+      );
       window.reactRoot = document.getElementById('react');
     </script>
     {% if bundle_js %}
@@ -381,12 +384,8 @@ Below is the Django app view's **index.html** template that can render across mu
 ```
 The context's `component` and `props` are bound to `window.component` and `window.props` respectively.
 
-Note the use of the `json` filter when setting `windows.props`! `{% load cra_helper_tags %}` provides this filter as a way to easily sanitize and convert a Python `dict` to a Javascript `Object`. The View context prepared above thus renders to the following typical Javascript Object:
+Note the use of the `json_script` filter when setting `windows.props`. [Django provides this filter](https://docs.djangoproject.com/en/3.1/ref/templates/builtins/#json-script) as a way to easily sanitize and convert a Python `dict` to a Javascript `Object`. The contents of the injected `<script>` tag can be run through `JSON.parse()` to safely assign it to a variable.
 
-```js
-// This is what is returned in the rendered HTML
-window.props = {"env": "Django"};
-```
 Finally, `window.reactRoot` specifies the container element that the React component should be rendered into. Setting a value for this is only required if the container's `id` is *not* **"root"** (the same ID assigned to the container `<div>` in the CRA project's `index.html`.)
 
 ### Combining Django and React routes
