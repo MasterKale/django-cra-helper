@@ -1,7 +1,7 @@
 <!-- omit in toc -->
 # django-cra-helper
 
-[![PyPI version](https://badge.fury.io/py/django-cra-helper.svg)](https://pypi.org/project/django-cra-helper/)
+[![PyPI version](https://img.shields.io/pypi/v/django-cra-helper?color=success&logo=pypi&logoColor=white)](https://pypi.org/project/django-cra-helper/)
 
 - [Introduction](#introduction)
 - [Installation](#installation)
