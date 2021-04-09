@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.1
+
+**Changes:**
+- Bump `urllib` to v1.26.4
+- Bump `django` to v3.1.8
+
 ## v2.0.0
 
 **Changes:**
