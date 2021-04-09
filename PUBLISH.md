@@ -14,6 +14,8 @@ $> pip install --user --upgrade twine wheel
 
 ## Step-by-step
 
+### 0. Upgrade version in `setup()` in **setup.py**
+
 ### 1. Remove previous build output:
 
 ```sh
